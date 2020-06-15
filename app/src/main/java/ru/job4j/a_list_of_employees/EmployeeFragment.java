@@ -20,7 +20,9 @@ public class EmployeeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.employee, container, false);
         List<Employee> employees = VirtualDatabase.getInstance().getEmployees();
-        Employee employee = employees.stream().filter(empl -> empl.hashCode() == Objects.requireNonNull(getArguments()).getInt("employeeHashCode", 0)).findFirst().orElse(null);
+        Employee employee = employees.stream()
+                .filter(empl -> empl.hashCode() == Objects.requireNonNull(getArguments()).getInt("employeeHashCode", 0))
+                .findFirst().orElse(null);
         ImageView image = view.findViewById(R.id.imageView);
         image.setImageResource(Objects.requireNonNull(employee).getImage());
         TextView name = view.findViewById(R.id.emploName);

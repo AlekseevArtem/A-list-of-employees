@@ -33,8 +33,9 @@ public class EmployeesFragment extends Fragment {
 
     private void updateUI() {
         List<Employee> employees = VirtualDatabase.getInstance().getEmployees();
+        int specialtyID = Objects.requireNonNull(getArguments()).getInt("specialtyId", 0);
         employees = employees.stream().
-                filter(employee -> employee.getSpecialty().getId() == Objects.requireNonNull(getArguments()).getInt("specialtyId", 0))
+                filter(employee -> employee.getSpecialty().getId() == specialtyID)
                 .collect(Collectors.toList());
         this.recycler.setAdapter(new EmployeesFragment.ExamAdapter(employees));
     }
@@ -47,33 +48,28 @@ public class EmployeesFragment extends Fragment {
         return employees;
     }
 
-    public class ExamHolder extends RecyclerView.ViewHolder {
-        private View view;
-        public ExamHolder(@NonNull View view) {
-            super(view);
-            this.view = itemView;
-        }
-    }
-
-    public class ExamAdapter extends RecyclerView.Adapter<EmployeesFragment.ExamHolder> {
+    public class ExamAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         private final List<Employee> employees;
         public ExamAdapter(List<Employee> specialty) {
             this.employees = specialty;
         }
         @NonNull
         @Override
-        public EmployeesFragment.ExamHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.info_employees, parent, false);
-            return new EmployeesFragment.ExamHolder(view);
+            return new RecyclerViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull EmployeesFragment.ExamHolder holder, int i) {
+        public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int i) {
             final Employee employee = this.employees.get(i);
-            TextView employeeName = holder.view.findViewById(R.id.EmployeeNameSurname);
+            TextView employeeName = holder.getView().findViewById(R.id.EmployeeNameSurname);
             employeeName.setText(String.format("%s %s", employee.getName(), employee.getSurname()));
-            employeeName.setOnClickListener(view -> openToast(view, employee));
+            employeeName.setOnClickListener(view -> {
+                openToast(view, employee);
+                createNextFragment(view, employee);
+            });
         }
 
         private void openToast(View view, Employee employee) {
@@ -81,12 +77,24 @@ public class EmployeesFragment extends Fragment {
                     getContext(), "You select " + employee,
                     Toast.LENGTH_SHORT
             ).show();
-            EmployeeFragment fragment = (EmployeeFragment) Objects.requireNonNull(getActivity()).getSupportFragmentManager().findFragmentByTag("EmployeeFragment");
-            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        }
+
+        private void createNextFragment(View view, Employee employee) {
+            EmployeeFragment fragment = (EmployeeFragment) Objects.requireNonNull(getActivity())
+                    .getSupportFragmentManager()
+                    .findFragmentByTag("EmployeeFragment");
+            FragmentTransaction transaction = getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction();
             if(fragment == null) {
-                fragmentTransaction.add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment").commit();
+                transaction
+                        .add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment")
+                        .commit();
             } else {
-                fragmentTransaction.remove(fragment).add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment").commit();
+                transaction
+                        .remove(fragment)
+                        .add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment")
+                        .commit();
             }
         }
 
