@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -58,7 +57,7 @@ public class EmployeesFragment extends Fragment {
         public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.info_employees, parent, false);
-            return new RecyclerViewHolder(view);
+            return new RecyclerViewHolder(view, (Callback) getActivity());
         }
 
         @Override
@@ -68,7 +67,7 @@ public class EmployeesFragment extends Fragment {
             employeeName.setText(String.format("%s %s", employee.getName(), employee.getSurname()));
             employeeName.setOnClickListener(view -> {
                 openToast(view, employee);
-                createNextFragment(view, employee);
+                holder.bind(view, employee);
             });
         }
 
@@ -77,25 +76,6 @@ public class EmployeesFragment extends Fragment {
                     getContext(), "You select " + employee,
                     Toast.LENGTH_SHORT
             ).show();
-        }
-
-        private void createNextFragment(View view, Employee employee) {
-            EmployeeFragment fragment = (EmployeeFragment) Objects.requireNonNull(getActivity())
-                    .getSupportFragmentManager()
-                    .findFragmentByTag("EmployeeFragment");
-            FragmentTransaction transaction = getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction();
-            if(fragment == null) {
-                transaction
-                        .add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment")
-                        .commit();
-            } else {
-                transaction
-                        .remove(fragment)
-                        .add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment")
-                        .commit();
-            }
         }
 
         @Override

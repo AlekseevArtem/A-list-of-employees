@@ -10,12 +10,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SpecialtiesFragment extends Fragment {
@@ -49,7 +47,7 @@ public class SpecialtiesFragment extends Fragment {
         public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.info_specialties, parent, false);
-            return new RecyclerViewHolder(view);
+            return new RecyclerViewHolder(view, (Callback) getActivity());
         }
 
         @Override
@@ -61,7 +59,7 @@ public class SpecialtiesFragment extends Fragment {
             specialtyId.setText(String.valueOf(specialty.getId()));
             specialtyName.setOnClickListener(view -> {
                         openToast(view, specialty);
-                        createNextFragment(view, specialty);
+                        holder.bind(view, specialty);
             });
         }
 
@@ -70,27 +68,6 @@ public class SpecialtiesFragment extends Fragment {
                     getContext(), "You select " + specialty,
                     Toast.LENGTH_SHORT
             ).show();
-        }
-
-        private void createNextFragment(View view, Specialty specialty) {
-            EmployeesFragment employees = (EmployeesFragment) Objects.requireNonNull(getActivity())
-                    .getSupportFragmentManager()
-                    .findFragmentByTag("EmployeesFragment");
-            EmployeeFragment employee = (EmployeeFragment) Objects.requireNonNull(getActivity())
-                    .getSupportFragmentManager()
-                    .findFragmentByTag("EmployeeFragment");
-            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-            if(employees == null) {
-                transaction
-                        .add(R.id.content, EmployeesFragment.of(specialty.getId()), "EmployeesFragment")
-                        .commit();
-            } else {
-                if (employee != null) { transaction = transaction.remove(employee); }
-                transaction
-                        .remove(employees)
-                        .add(R.id.content, EmployeesFragment.of(specialty.getId()), "EmployeesFragment")
-                        .commit();
-            }
         }
 
         @Override
