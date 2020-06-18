@@ -37,25 +37,40 @@ public class SpecialtiesFragment extends Fragment {
         this.recycler.setAdapter(new ExamAdapter(specialty));
     }
 
-    public class ExamAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
+    public static class Holder extends RecyclerView.ViewHolder {
+        private View view;
+        private final CallbackEmployees callback;
+
+        public Holder(@NonNull View view, CallbackEmployees callback) {
+            super(view);
+            this.view = itemView;
+            this.callback = callback;
+        }
+
+        public void bind(View view, Specialty specialty) {
+            callback.createFragmentEmployees(view, specialty);
+        }
+    }
+
+    public class ExamAdapter extends RecyclerView.Adapter<Holder> {
         private final List<Specialty> specialty;
         public ExamAdapter(List<Specialty> specialty) {
             this.specialty = specialty;
         }
         @NonNull
         @Override
-        public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.info_specialties, parent, false);
-            return new RecyclerViewHolder(view, (Callback) getActivity());
+            return new Holder(view, (CallbackEmployees) getActivity());
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int i) {
+        public void onBindViewHolder(@NonNull Holder holder, int i) {
             final Specialty specialty = this.specialty.get(i);
-            TextView specialtyName = holder.getView().findViewById(R.id.SpecialtyName);
+            TextView specialtyName = holder.view.findViewById(R.id.SpecialtyName);
             specialtyName.setText(specialty.getName());
-            TextView specialtyId = holder.getView().findViewById(R.id.SpecialtyId);
+            TextView specialtyId = holder.view.findViewById(R.id.SpecialtyId);
             specialtyId.setText(String.valueOf(specialty.getId()));
             specialtyName.setOnClickListener(view -> {
                         openToast(view, specialty);

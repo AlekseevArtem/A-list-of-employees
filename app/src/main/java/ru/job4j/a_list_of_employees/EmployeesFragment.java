@@ -47,23 +47,38 @@ public class EmployeesFragment extends Fragment {
         return employees;
     }
 
-    public class ExamAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
+    public static class Holder extends RecyclerView.ViewHolder {
+        private View view;
+        private final CallbackEmployee callback;
+
+        public Holder(@NonNull View view, CallbackEmployee callback) {
+            super(view);
+            this.view = itemView;
+            this.callback = callback;
+        }
+
+        public void bind(View view, Employee employee) {
+            callback.createFragmentEmployee(view, employee);
+        }
+    }
+
+    public class ExamAdapter extends RecyclerView.Adapter<Holder> {
         private final List<Employee> employees;
         public ExamAdapter(List<Employee> specialty) {
             this.employees = specialty;
         }
         @NonNull
         @Override
-        public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.info_employees, parent, false);
-            return new RecyclerViewHolder(view, (Callback) getActivity());
+            return new Holder(view, (CallbackEmployee) getActivity());
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int i) {
+        public void onBindViewHolder(@NonNull Holder holder, int i) {
             final Employee employee = this.employees.get(i);
-            TextView employeeName = holder.getView().findViewById(R.id.EmployeeNameSurname);
+            TextView employeeName = holder.view.findViewById(R.id.EmployeeNameSurname);
             employeeName.setText(String.format("%s %s", employee.getName(), employee.getSurname()));
             employeeName.setOnClickListener(view -> {
                 openToast(view, employee);
