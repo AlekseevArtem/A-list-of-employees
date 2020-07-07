@@ -2,14 +2,16 @@ package ru.job4j.a_list_of_employees;
 
 import java.util.Objects;
 
-class Employee {
+public class Employee {
+    private int id;
     private String name;
     private String surname;
     private String birthday;
     private int image;
     private Specialty specialty;
 
-    public Employee(String name, String surname, String birthday, int image, Specialty specialty) {
+    public Employee(int id, String name, String surname, String birthday, int image, Specialty specialty) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.birthday = birthday;
@@ -17,6 +19,18 @@ class Employee {
         this.specialty = specialty;
     }
 
+    public Employee(int id, String name, String surname, String birthday, int image) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.birthday = birthday;
+        this.image = image;
+    }
+
+
+    public int getId() {
+        return id;
+    }
 
     public String getName() {
         return name;

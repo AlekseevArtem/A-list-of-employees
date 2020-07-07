@@ -5,10 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-class VirtualDatabase {
+public class VirtualDatabase {
     private int size = 200;
     private List<Employee> employees = new ArrayList<>(size);
-    private static final VirtualDatabase INST = new VirtualDatabase();
     private List<String> maleName = Arrays.asList("Артем", "Иван", "Антон", "Павел", "Сергей", "Алексей", "Михаил");
     private List<String> femaleName = Arrays.asList("Алла", "Инна", "Елизавета", "Виктория", "Светлана", "Елена");
     private List<String> surname = Arrays.asList("Алексеев", "Иванов", "Петров", "Семенов", "Гагарин", "Павлов", "Королев", "Арсентьев");
@@ -24,11 +23,12 @@ class VirtualDatabase {
             new Specialty(5213, "Android Developer")
     );
 
-    private VirtualDatabase() {
+    public VirtualDatabase() {
         for (int i = 0; i < size; i++) {
             int femaleOrMale = new Random().nextInt(this.size);
             if (femaleOrMale < 60) {
                 employees.add(new Employee(
+                        i,
                         maleName.get(new Random().nextInt(maleName.size())),
                         surname.get(new Random().nextInt(surname.size())),
                         birthday.get(new Random().nextInt(surname.size())),
@@ -37,6 +37,7 @@ class VirtualDatabase {
                 ));
             } else {
                 employees.add(new Employee(
+                        i,
                         femaleName.get(new Random().nextInt(femaleName.size())),
                         surname.get(new Random().nextInt(surname.size()))+"a",
                         birthday.get(new Random().nextInt(surname.size())),
@@ -49,9 +50,5 @@ class VirtualDatabase {
 
     public List<Employee> getEmployees() {
         return employees;
-    }
-
-    public static VirtualDatabase getInstance() {
-        return INST;
     }
 }

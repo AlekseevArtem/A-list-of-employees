@@ -2,7 +2,7 @@ package ru.job4j.a_list_of_employees;
 
 import java.util.Objects;
 
-class Specialty {
+public class Specialty {
     private int id;
     private String name;
 

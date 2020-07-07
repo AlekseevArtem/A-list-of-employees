@@ -42,12 +42,12 @@ public class MainActivity extends AppCompatActivity implements CallbackEmployees
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (FragEmployee == null) {
             transaction
-                    .add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment")
+                    .add(R.id.content, EmployeeFragment.of(employee.getId()), "EmployeeFragment")
                     .commit();
         } else {
             transaction
                     .remove(FragEmployee)
-                    .add(R.id.content, EmployeeFragment.of(employee.hashCode()), "EmployeeFragment")
+                    .add(R.id.content, EmployeeFragment.of(employee.getId()), "EmployeeFragment")
                     .commit();
         }
     }
