@@ -1,7 +1,5 @@
 package ru.job4j.a_list_of_employees;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,20 +13,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ru.job4j.a_list_of_employees.Store.EmployeeBaseHelper;
-import ru.job4j.a_list_of_employees.Store.EmployeesDbSchema;
 
 public class SpecialtiesFragment extends Fragment {
     private RecyclerView recycler;
-    private SQLiteDatabase store;
+    private EmployeeBaseHelper store;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.specialties, container, false);
-        store = new EmployeeBaseHelper(getContext()).getWritableDatabase();
+        store = EmployeeBaseHelper.getInstance(getContext());
         this.recycler = view.findViewById(R.id.employees);
         this.recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         updateUI();
@@ -36,21 +33,10 @@ public class SpecialtiesFragment extends Fragment {
     }
 
     private void updateUI() {
-        List<Specialty> specialty = new ArrayList<>();
-        Cursor cursor = this.store.query(
-                EmployeesDbSchema.specialtyTable.NAME,
-                null, null, null,
-                null, null, null
-        );
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            specialty.add(new Specialty(
-                    cursor.getInt(cursor.getColumnIndex(EmployeesDbSchema.specialtyTable.Cols.ID)),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.specialtyTable.Cols.NAME))
-            ));
-            cursor.moveToNext();
-        }
-        cursor.close();
+        List<Specialty> specialty = store.getEmployees().stream()
+                .map(Employee::getSpecialty)
+                .distinct()
+                .collect(Collectors.toList());
         this.recycler.setAdapter(new SpecialtiesAdapter(specialty));
     }
 

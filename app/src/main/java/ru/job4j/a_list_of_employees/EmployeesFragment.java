@@ -1,7 +1,5 @@
 package ru.job4j.a_list_of_employees;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,22 +13,20 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import ru.job4j.a_list_of_employees.Store.EmployeeBaseHelper;
-import ru.job4j.a_list_of_employees.Store.EmployeesDbSchema;
 
 
 public class EmployeesFragment extends Fragment {
     private RecyclerView recycler;
-    private SQLiteDatabase store;
+    private EmployeeBaseHelper store = EmployeeBaseHelper.getInstance(getContext());
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.employees, container, false);
-        store = new EmployeeBaseHelper(getContext()).getWritableDatabase();
         this.recycler = view.findViewById(R.id.employees);
         this.recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         updateUI();
@@ -39,25 +35,9 @@ public class EmployeesFragment extends Fragment {
 
     private void updateUI() {
         int specialtyID = Objects.requireNonNull(getArguments()).getInt("specialtyId", 0);
-        List<Employee> employees = new ArrayList<>();
-        Cursor cursor = this.store.query(
-                EmployeesDbSchema.employeeTable.NAME,
-                null, EmployeesDbSchema.employeeTable.Cols.SPECIALTY_ID+" = ?",
-                new String[]{String.valueOf(specialtyID)},
-                null, null, null
-        );
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            employees.add(new Employee(
-                    cursor.getInt(cursor.getColumnIndex("id")),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.NAME)),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.SURNAME)),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.BIRTHDAY)),
-                    cursor.getInt(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.IMAGE))
-            ));
-            cursor.moveToNext();
-        }
-        cursor.close();
+        List<Employee> employees = store.getEmployees().stream()
+                .filter(employee -> employee.getSpecialty().getId() == specialtyID)
+                .collect(Collectors.toList());
         this.recycler.setAdapter(new EmployeesFragment.ExamAdapter(employees));
     }
 

@@ -19,15 +19,6 @@ public class Employee {
         this.specialty = specialty;
     }
 
-    public Employee(int id, String name, String surname, String birthday, int image) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.birthday = birthday;
-        this.image = image;
-    }
-
-
     public int getId() {
         return id;
     }
