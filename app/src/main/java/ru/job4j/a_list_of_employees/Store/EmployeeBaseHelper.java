@@ -10,35 +10,17 @@ import java.util.List;
 
 import ru.job4j.a_list_of_employees.Employee;
 import ru.job4j.a_list_of_employees.Specialty;
-import ru.job4j.a_list_of_employees.VirtualDatabase;
 
 public class EmployeeBaseHelper extends SQLiteOpenHelper {
     public static final String DB = "employees.db";
     public static final int VERSION = 1;
     private static EmployeeBaseHelper INST;
-    private List<Employee> employees = new ArrayList<>();
+    private Context context;
+    private SQLiteDatabase db;
 
     private EmployeeBaseHelper(Context context) {
         super(context, DB, null, VERSION);
-        Cursor cursor = this.getWritableDatabase().query(
-                EmployeesDbSchema.employeeTable.NAME,
-                null, null, null,
-                null, null, null
-        );
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            employees.add(new Employee(
-                    cursor.getInt(cursor.getColumnIndex("id")),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.NAME)),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.SURNAME)),
-                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.BIRTHDAY)),
-                    cursor.getInt(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.IMAGE)),
-                    takeSpecialty(cursor.getInt(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.SPECIALTY_ID)))
-
-            ));
-            cursor.moveToNext();
-        }
-        cursor.close();
+        this.context = context;
     }
 
     private Specialty takeSpecialty(int specialtyID) {
@@ -58,6 +40,26 @@ public class EmployeeBaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Employee> getEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        Cursor cursor = this.getWritableDatabase().query(
+                EmployeesDbSchema.employeeTable.NAME,
+                null, null, null,
+                null, null, null
+        );
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            employees.add(new Employee(
+                    cursor.getInt(cursor.getColumnIndex("id")),
+                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.NAME)),
+                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.SURNAME)),
+                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.BIRTHDAY)),
+                    cursor.getString(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.IMAGE)),
+                    takeSpecialty(cursor.getInt(cursor.getColumnIndex(EmployeesDbSchema.employeeTable.Cols.SPECIALTY_ID)))
+
+            ));
+            cursor.moveToNext();
+        }
+        cursor.close();
         return employees;
     }
 
@@ -70,6 +72,7 @@ public class EmployeeBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        this.db = db;
         db.execSQL(
                 "create table " + EmployeesDbSchema.specialtyTable.NAME + " ("+
                         EmployeesDbSchema.specialtyTable.Cols.ID + " integer, " +
@@ -81,17 +84,17 @@ public class EmployeeBaseHelper extends SQLiteOpenHelper {
                         EmployeesDbSchema.employeeTable.Cols.NAME + " text, " +
                         EmployeesDbSchema.employeeTable.Cols.SURNAME + " text, " +
                         EmployeesDbSchema.employeeTable.Cols.BIRTHDAY + " text, " +
-                        EmployeesDbSchema.employeeTable.Cols.IMAGE + " integer, " +
+                        EmployeesDbSchema.employeeTable.Cols.IMAGE + " text, " +
                         EmployeesDbSchema.employeeTable.Cols.SPECIALTY_ID + " integer)"
         );
-        insertAllEmployees(new VirtualDatabase().getEmployees(), db);
+        new RetrofitForJSON(context).getAllEmployees();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
     }
 
-    private String insertEmployee(String name, String surname, String birthday, int image, int specialty_id) {
+    private String insertEmployee(String name, String surname, String birthday, String image, int specialty_id) {
         return "insert into employee (name, surname, birthday, image, specialty_id) values (" +
                 "'" + name + "'," +
                 "'" + surname + "'," +
@@ -106,7 +109,7 @@ public class EmployeeBaseHelper extends SQLiteOpenHelper {
                 " '" + name + "')";
     }
 
-    private void insertAllEmployees(List<Employee> employees, SQLiteDatabase db) {
+    public void insertAllEmployees(List<Employee> employees) {
         employees.stream()
                 .map(Employee::getSpecialty)
                 .distinct()

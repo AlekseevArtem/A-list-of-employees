@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.util.Objects;
 
 import ru.job4j.a_list_of_employees.Store.EmployeeBaseHelper;
@@ -24,7 +27,9 @@ public class EmployeeFragment extends Fragment {
         int employeeID = Objects.requireNonNull(getArguments()).getInt("employeeID", 0);
         Employee employee = store.getEmployees().stream().filter(emp -> emp.getId() == employeeID).findFirst().orElse(null);
         ImageView image = view.findViewById(R.id.imageView);
-        image.setImageResource(Objects.requireNonNull(employee).getImage());
+        if(!employee.getImage().equals("")){
+            Picasso.with(getContext()).load(Objects.requireNonNull(employee).getImage()).into(image);
+        }
         TextView name = view.findViewById(R.id.emploName);
         name.setText(employee.getName());
         TextView surname = view.findViewById(R.id.emploSurname);

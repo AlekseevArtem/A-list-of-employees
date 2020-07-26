@@ -1,16 +1,23 @@
 package ru.job4j.a_list_of_employees;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 import java.util.Objects;
 
 public class Employee {
     private int id;
+    @SerializedName("f_name")
     private String name;
+    @SerializedName("l_name")
     private String surname;
     private String birthday;
-    private int image;
+    @SerializedName("avatr_url")
+    private String image;
+    @SerializedName("specialty")
     private Specialty specialty;
 
-    public Employee(int id, String name, String surname, String birthday, int image, Specialty specialty) {
+    public Employee(int id, String name, String surname, String birthday, String image, Specialty specialty) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -35,7 +42,7 @@ public class Employee {
         return birthday;
     }
 
-    public int getImage() {
+    public String getImage() {
         return image;
     }
 

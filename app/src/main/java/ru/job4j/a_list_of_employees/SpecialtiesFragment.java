@@ -32,7 +32,7 @@ public class SpecialtiesFragment extends Fragment {
         return view;
     }
 
-    private void updateUI() {
+    public void updateUI() {
         List<Specialty> specialty = store.getEmployees().stream()
                 .map(Employee::getSpecialty)
                 .distinct()

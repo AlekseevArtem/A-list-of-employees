@@ -2,12 +2,17 @@ package ru.job4j.a_list_of_employees;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-public class MainActivity extends AppCompatActivity implements CallbackEmployees,CallbackEmployee {
+import java.util.Objects;
+
+import ru.job4j.a_list_of_employees.Store.RetrofitForJSON;
+
+public class MainActivity extends AppCompatActivity implements CallbackEmployees,CallbackEmployee, RetrofitForJSON.getAllEmployees {
 
     @Override
     protected void onCreate(@Nullable Bundle saved) {
@@ -50,5 +55,23 @@ public class MainActivity extends AppCompatActivity implements CallbackEmployees
                     .add(R.id.content, EmployeeFragment.of(employee.getId()), "EmployeeFragment")
                     .commit();
         }
+    }
+
+    @Override
+    public void successGetAllEmployees(boolean response, int code) {
+        if(response) {
+            SpecialtiesFragment fragment = (SpecialtiesFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment);
+            MainActivity.this.runOnUiThread(() -> Objects.requireNonNull(fragment).updateUI());
+        } else {
+            Toast.makeText(getApplicationContext(),
+                    String.format("Error, response status: %s", code), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void failedGetAllEmployees(String code) {
+        Toast.makeText(getApplicationContext(),
+                String.format("Error: %s", code), Toast.LENGTH_SHORT).show();
     }
 }

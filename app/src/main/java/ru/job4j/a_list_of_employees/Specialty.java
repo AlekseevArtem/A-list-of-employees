@@ -1,8 +1,11 @@
 package ru.job4j.a_list_of_employees;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Objects;
 
 public class Specialty {
+    @SerializedName("specialty_id")
     private int id;
     private String name;
 
